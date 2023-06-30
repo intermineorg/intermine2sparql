@@ -1,0 +1,789 @@
+id: https://w3id.org/intermine-core
+name: intermine-core
+version: 0.0.1
+description: |-
+  The core schema for InterMine
+license: https://creativecommons.org/publicdomain/zero/1.0/
+
+imports:
+  - linkml:types
+prefixes:
+  intermine: https://w3id.org/intermine/
+  linkml: https://w3id.org/linkml/
+  rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  rdfs: http://www.w3.org/2000/01/rdf-schema#
+  skos: http://www.w3.org/2004/02/skos/core#
+  schema: http://schema.org/
+  bibo: http://purl.org/ontology/bibo/
+  NCIT: http://purl.obolibrary.org/obo/NCIT_
+  SIO: http://semanticscience.org/resource/SIO_
+  foaf: http://xmlns.com/foaf/0.1/
+  OIO: http://www.geneontology.org/formats/oboInOwl#
+  EDAM: http://edamontology.org/
+  dc: http://purl.org/dc/elements/1.1/
+  dcterms: http://purl.org/dc/terms/
+  RO: http://purl.obolibrary.org/obo/RO_
+  GENO: http://purl.obolibrary.org/obo/GENO_
+  ERO: http://purl.obolibrary.org/obo/ERO_
+  uniprot.core: http://purl.uniprot.org/core/
+  SO: http://purl.obolibrary.org/obo/SO_
+  ECO: http://purl.obolibrary.org/obo/ECO_
+
+default_prefix: intermine
+default_range: string
+
+classes:
+
+  Annotable:
+    slots:
+      - primaryIdentifier
+      - ontologyAnnotations
+      - publications
+
+  Author:
+    class_uri: NCIT:C42781
+    slots:
+      - firstName
+      - lastName
+      - name
+      - initials
+      - publications
+    slot_usage:
+      firstName:
+        slot_uri: foaf:givenname
+      lastName:
+        slot_uri: foaf:family_name
+      name:
+        slot_uri: foaf:name
+      publications:
+        range: Publication
+        multivalued: true
+    
+
+  BioEntity:
+    is_a: Annotable
+    slots:
+      - secondaryIdentifier
+      - symbol
+      - name
+      - organism
+      - locatedFeatures
+      - locations
+      - synonyms
+      - dataSets
+      - crossReferences
+    slot_usage:
+      secondaryIdentifier:
+        slot_uri: SIO:000673
+      symbol:
+        slot_uri: skos:prefLabel
+      name:
+        slot_uri: rdfs:label
+      organism:
+        slot_uri: http://purl.org/net/orth#organism
+        range: Organism
+        multivalued: false
+      locatedFeatures:
+        range: Location
+        multivalued: true
+      locations:
+        range: Location
+        multivalued: true
+      synonyms:
+        slot_uri: http://purl.obolibrary.org/obo/synonym
+        range: Synonym
+        multivalued: true
+      dataSets:
+        slot_uri: SIO:001278
+        range: DataSet
+        multivalued: true
+      crossReferences:
+        slot_uri: OIO:hasDbXref
+        range: CrossReference
+        multivalued: true
+
+
+  SequenceFeature:
+    is_a: BioEntity
+    class_uri: SO:0000110
+    slots:
+      - score
+      - scoreType
+      - length
+      - sequence
+      - chromosome
+      - chromosomeLocation
+      - sequenceOntologyTerm
+      - strain
+      - overlappingFeatures
+      - childFeatures
+    slot_usage:
+      score:
+        slot_uri: EDAM:data_1772
+        range: double
+      scoreType:
+        slot_uri: dcterms:type
+      length:
+        slot_uri: dcterms:type
+        range: integer
+      sequence:
+        range: Sequence
+        multivalued: false
+      chromosome:
+        slot_uri: dcterms:isPartOf
+        range: Chromosome
+        multivalued: false
+      chromosomeLocation:
+        range: Location
+        multivalued: false
+      sequenceOntologyTerm:
+        range: SOTerm
+        multivalued: false
+      strain:
+        range: Strain
+        multivalued: false
+      overlappingFeatures:
+        range: SequenceFeature
+        multivalued: true
+      childFeatures:
+        range: SequenceFeature
+        multivalued: true
+
+  Chromosome:
+    is_a: SequenceFeature
+    class_uri: SO:0000340
+
+  Comment:
+    class_uri: SIO:001167
+    slots:
+      - description
+      - type
+    slot_usage:
+      description:
+        slot_uri: dcterms:description
+      type:
+        slot_uri: http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C25284
+
+
+  CrossReference:
+    class_uri: SIO:001171
+    slots:
+    - identifier
+    - source
+    - subject
+    slot_usage:
+      identifier:
+        slot_uri: SIO:000673
+      source:
+        slot_uri: SIO:001278
+        range: DataSource
+        multivalued: false
+      subject:
+        slot_uri: OIO:hasDbXref
+        range: BioEntity
+        multivalued: false
+
+
+
+  DataSource:
+    class_uri: NCIT:C25683
+    slots:
+      - name
+      - url
+      - description
+      - publications
+      - dataSets
+    slot_usage:
+      name:
+        slot_uri: rdfs:label
+      url:
+        slot_uri: EDAM:data_1052
+      description:
+        slot_uri: dcterms:description
+      publications:
+        slot_uri: dcterms:bibliographicCitation
+        range: Publication
+        multivalued: true
+      dataSets:
+        range: DataSet
+        multivalued: true
+
+  DataSet:
+    class_uri: SIO:000089
+    slots:
+      - name
+      - url
+      - description
+      - version
+      - licence
+      - dataSource
+      - publication
+      - bioEntities
+    slot_usage:
+      name:
+        slot_uri: rdfs:label
+      url:
+        slot_uri: schema:url
+      description:
+        slot_uri: dcterms:description
+      version:
+        slot_uri: dcterms:hasVersion
+      licence:
+        slot_uri: dcterms:license
+      dataSource:
+        slot_uri: dcterms:source
+        range: DataSource
+        multivalued: false
+      publication:
+        slot_uri: dcterms:bibliographicCitation
+        range: Publication
+        multivalued: false
+      bioEntities:
+        slot_uri: SIO:001277
+        range: BioEntity
+        multivalued: true
+
+  Gene:
+    class_uri: SO:0000704
+    is_a: SequenceFeature
+    slots:
+      - description
+      - briefDescription
+      - proteins
+    slot_usage:
+      description:
+        slot_uri: dcterms:description
+      briefDescription:
+        slot_uri: SIO:000136
+      proteins:
+        slot_uri: SIO:010078
+        range: Protein
+        multivalued: true
+
+  Location:
+    class_uri: SO:0000735
+    slots:
+      - start
+      - end
+      - strand
+      - feature
+      - locatedOn
+      - dataSets
+    slot_usage:
+      start:
+        slot_uri: RO:0002231
+        range: integer
+      end:
+        slot_uri: RO:0002232
+        range: integer
+      strand:
+        slot_uri: GENO:0000906
+      feature:
+        range: BioEntity
+        multivalued: false
+      locatedOn:
+        range: BioEntity
+        multivalued: false
+      dataSets:
+        range: DataSet
+        multivalued: true
+  
+  MeshTerm:
+    class_uri: EDAM:data_0966
+    slots:
+      - name
+      - publications
+    slot_usage:
+      name:
+        slot_uri: rdfs:label
+      publications:
+        slot_uri: dcterms:bibliographicCitation
+        range: Publication
+        multivalued: true
+  
+  Ontology:
+    class_uri: SIO:001391
+    slots:
+      - name
+      - url
+      - dataSets
+    slot_usage:
+      name:
+        slot_uri: rdfs:label
+      url:
+        slot_uri: EDAM:data_1052
+      dataSets:
+        range: DataSet
+        multivalued: true
+
+  OntologyAnnotationEvidenceCode:
+    class_uri: ECO:0000000
+    slots:
+      - code
+      - name
+      - url
+    slot_usage:
+      name:
+        slot_uri: rdfs:label
+      url:
+        slot_uri: EDAM:data_1052
+
+  OntologyEvidence:
+    class_uri: ECO:0000000
+    slots:
+      - code
+      - publications
+    slot_usage:
+      code:
+        range: OntologyAnnotationEvidenceCode
+        multivalued: false
+      publications:
+        slot_uri: dcterms:bibliographicCitation
+        range: Publication
+        multivalued: true
+
+  OntologyTerm:
+    class_uri: SIO:000275
+    slots:
+      - identifier
+      - name
+      - description
+      - namespace
+      - obsolete
+      - ontology
+      - relations
+      - synonyms
+      - ontologyAnnotations
+      - parents
+      - dataSets
+      - crossReferences
+    slot_usage:
+      identifier: 
+        slot_uri: SIO:000675
+      name:
+        slot_uri: rdfs:label
+      description:
+        slot_uri: dcterms:description
+      namespace:
+        slot_uri: SIO:000067
+      obsolete:
+        slot_uri: http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C63553
+        range: boolean
+      ontology:
+        range: Ontology
+        multivalued: false
+      relations:
+        range: OntologyRelation
+        multivalued: true
+      synonyms:
+        range: OntologyTermSynonym
+        multivalued: true
+      ontologyAnnotations:
+        range: OntologyAnnotation
+        multivalued: true
+      parents:
+        range: OntologyTerm
+        multivalued: true
+      dataSets:
+        range: DataSet
+        multivalued: true
+      crossReferences:
+        range: OntologyTerm
+        multivalued: true
+
+
+  OntologyRelation:
+    slots:
+      - parentTerm
+      - childTerm
+      - relationship
+      - direct
+      - redundant
+    slot_usage:
+      parentTerm:
+        range: OntologyTerm
+        multivalued: false
+      childTerm:
+        range: OntologyTerm
+        multivalued: false
+      direct:
+        range: boolean
+      redundant:
+        range: boolean
+
+  OntologyAnnotation:
+    class_uri: SIO:001166
+    slots:
+       - qualifier
+       - subject
+       - ontologyTerm
+       - dataSets
+       - evidence
+    slot_usage:
+      qualifier:
+        slot_uri: http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C41009
+      subject:
+        range: Annotable
+        multivalued: false
+      ontologyTerm:
+        range: OntologyTerm
+        multivalued: false
+      dataSets:
+        range: DataSet
+        multivalued: true
+      evidence:
+        range: OntologyEvidence
+        multivalued: true
+
+  OntologyTermSynonym:
+    class_uri: SIO:000122
+    slots:
+      - name
+      - type
+    slot_usage:
+      name:
+        slot_uri: EDAM:data_2099
+      type:
+        slot_uri: http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C25284
+
+  Organism:
+    class_uri: SIO:010000
+    slots:
+      - genus
+      - taxonId
+      - species
+      - commonName
+      - name
+      - strains
+    slot_usage:
+      genus:
+        slot_uri: EDAM:data_1870
+      taxonId:
+        slot_uri: EDAM:data_1179
+      species:
+        slot_uri: EDAM:data_1045
+      commonName:
+        slot_uri: EDAM:data_2909
+      shortName:
+        slot_uri: EDAM:data_2909
+      name:
+        slot_uri: rdfs:label
+      strains:
+        range: Strain
+        multivalued: true
+
+  Protein:
+    class_uri: uniprot.core:Protein
+    is_a: BioEntity
+    slots:
+      - md5checksum
+      - primaryAccession
+      - length
+      - molecularWeight
+      - sequence
+      - genes
+    slot_usage:
+      md5checksum:
+        slot_uri: uniprot.core:md5Checksum
+      primaryAccession:
+        slot_uri: ERO:0000405
+      length:
+        slot_uri: dcterms:SizeOrDuration
+      molecularWeight:
+        slot_uri: uniprot.core:mass
+      sequence:
+        slot_uri: uniprot.core:sequence
+        range: Sequence
+        multivalued: false
+      genes:
+        slot_uri: SIO:010079
+        range: Gene
+        multivalued: true
+
+  Publication:
+    class_uri: BIBO:Article
+    slots:
+      - title
+      - doi
+      - issue
+      - pubMedId
+      - pages
+      - month
+      - year
+      - volume
+      - journal
+      - firstAuthor
+      - abstractText
+      - authors
+      - entities
+      - meshTerms
+    slot_usage:
+      title:
+        slot_uri: dcterms:title
+      doi:
+        slot_uri: BIBO:doi
+      issue:
+        slot_uri: BIBO:issuer
+      pubMedId:
+        slot_uri: ERO:0000569
+      pages:
+        slot_uri: BIBO:numPages
+      year:
+        slot_uri: dcterms:date
+      volume:
+        slot_uri: BIBO:volume
+      journal:
+        slot_uri: dcterms:publisher
+      firstAuthor:
+        slot_uri: dc:creator
+      abstractText:
+        slot_uri: BIBO:abstract
+      authors:
+        slot_uri: BIBO:authorList
+        range: Author
+        multivalued: true
+      entities:
+        range: Annotable
+        multivalued: true
+      meshTerms:
+        range: MeshTerm
+        multivalued: true
+
+  SOTerm:
+    is_a: OntologyTerm
+    class_uri: EDAM:data_0966
+  
+  Sequence:
+    class_uri: EDAM:data_2044
+    slots:
+      - residues
+      - length
+      - md5checksum
+    slot_usage:
+      residues:
+        slot_uri: rdf:value
+      length:
+        slot_uri: dcterms:SizeOrDuration
+      md5checksum:
+        slot_uri: uniprot.core:md5Checksum
+
+
+  SequenceCollection:
+    is_a: BioEntity
+    class_uri: SO:0001260
+    slots:
+      - sequenceOntologyTerm
+    slot_usage:
+      sequenceOntologyTerm:
+        range: SOTerm
+        multivalued: false
+
+  Strain:
+    is_a: BioEntity
+    class_uri: SIO:010055
+    slots:
+      - annotationVersion
+      - assemblyVersion
+      - features
+    slot_usage:
+      features:
+        range: SequenceFeature
+        multivalued: true
+      strain:
+        range: Strain
+        multivalued: false
+
+  Synonym:
+    class_uri: SIO:000122
+    slots:
+      - value
+      - subject
+      - dataSets
+    slot_usage:
+      value:
+        slot_uri: rdfs:label
+      subject:
+        range: BioEntity
+        multivalued: false
+      dataSets:
+        slot_uri: SIO:001278
+
+
+  SyntenyBlock:
+    slots:
+      - syntenicRegions
+      - dataSets
+      - publications
+    slot_usage:
+      syntenicRegions:
+        range: SyntenicRegion
+        multivalued: true
+      dataSets:
+        range: DataSet
+        multivalued: true
+      publications:
+        range: Publication
+        multivalued: true
+
+  SyntenicRegion:
+    class_uri: SO:0005858
+    is_a: SequenceFeature
+    slots:
+      - syntenyBlock
+    slot_usage:
+      syntenyBlock:
+        range: SyntenyBlock
+        multivalued: false
+
+slots:
+
+  primaryIdentifier:
+  
+  ontologyAnnotations:
+
+  subject:
+
+  publications:
+
+  entities:
+
+  firstName:
+  
+  lastName:
+
+  name:
+
+  initials:
+
+  authors:
+
+  secondaryIdentifier:
+
+  symbol:
+
+  organism:
+
+  locatedFeatures:
+
+  locations:
+
+  synonyms:
+
+  dataSets:
+
+  crossReferences:
+
+  type:
+
+  identifier:
+
+  source:
+
+  url:
+
+  description:
+
+  version:
+
+  licence:
+
+  dataSource:
+
+  publication:
+
+  bioEntities:
+
+  briefDescription:
+
+  proteins:
+
+  start:
+
+  end:
+
+  strand:
+
+  feature:
+
+  locatedOn:
+
+  code:
+
+  namespace:
+
+  obsolete:
+
+  ontology:
+
+  relations:
+
+  parents:
+
+  parentTerm:
+
+  childTerm:
+
+  relationship:
+
+  direct:
+
+  redundant:
+
+  qualifier:
+
+  ontologyTerm:
+
+  evidence:
+
+  genus:
+
+  taxonId:
+
+  species:
+
+  commonName:
+
+  shortName:
+
+  strain:
+
+  strains:
+
+  md5checksum:
+
+  primaryAccession:
+
+  length:
+
+  molecularWeight:
+
+  sequence:
+
+  genes:
+
+  title:
+  doi:
+  issue:
+  pubMedId:
+  pages:
+  month:
+  year:
+  volume:
+  journal:
+  firstAuthor:
+  abstractText:
+  meshTerms:
+  residues:
+  sequenceOntologyTerm:
+  score:
+  scoreType:
+  chromosome:
+  chromosomeLocation:
+  overlappingFeatures:
+  childFeatures:
+  annotationVersion:
+  assemblyVersion:
+  features:
+  syntenicRegions:
+  syntenyBlock:
+  value:
